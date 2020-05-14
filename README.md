@@ -17,3 +17,6 @@ The chessboard can be run whitout all the features, for example, to not play wit
 the displays, the tft screen is also not prescindible so I decided to rewrite the code to simply play against
 the computer, removing the displays, tft and arduino Nano card. This way you can built a more simply board.
 I'll upload the rewriten code later.
+
+
+https://jacmatchessboard.blogspot.com
