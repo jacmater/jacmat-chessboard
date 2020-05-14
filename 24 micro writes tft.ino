@@ -1,7 +1,6 @@
-//MICRO escriu la capçalera de la pantalla
-//EScriu en pantalla la tria de l'increment de temps
-//i la tria dels minuts de joc.
-
+// MICRO writes the screen header
+// Write the choice of the time increment on the screen
+// and the choice of minutes of play.
 
 #include <Keypad.h>
 
@@ -9,18 +8,14 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
-#include "Adafruit_ILI9341.h" //llibreria per la tft
+#include "Adafruit_ILI9341.h" // tft library 
 
 #define TFT_DC A1  //PIN DC del SPI pot ser qualsevol
 #define TFT_CS A0  //PIN CS del SPI pot ser qualsevol
 //pantalla tft
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
-//el codi següent és per la caratula del taulell JacMAt
-//aquesta variable es emmagatzemada a la memoria flash del MICRO
-//per després ser enviadada a la pantalla, es crida amb l'ordre:
-//tft.drawBitmap(x,y,bitmap,W,H,color); de la lllibreria GFX
-
+//Header: a Knight bitmap
 
 const unsigned char  caratula[] PROGMEM=
 //0            10           20          30          40            50          60          70          80            90        100  
@@ -187,12 +182,12 @@ void setup() {
    
    tft.begin();
    uint8_t x = tft.readcommand8(ILI9341_RDMODE);
-    tft.setRotation(3); //escriu en horitzontal
+    tft.setRotation(3); //3 = horitzontal
     tft.setTextSize(2);
     tft.fillScreen(ILI9341_BLACK);
     yield();
     tft.setCursor(0,0);
-    tft.drawBitmap(110,30,caratula,104,128,ILI9341_YELLOW); //dibuix del caball
+    tft.drawBitmap(110,30,caratula,104,128,ILI9341_YELLOW); //header
     delay(500);
     tft.setCursor(60,180);
     tft.setTextColor(ILI9341_YELLOW);
@@ -201,8 +196,8 @@ void setup() {
     tft.fillScreen(ILI9341_BLACK);
     //  Keyboard.begin();
   
-//******************************** CAPÇALERA *******************************
-//***************************** SELECCIO TEMPS *****************************    
+//******************************** HEADER *******************************
+//*****************************  TIME SELECT *****************************    
     
     tft.setTextColor(ILI9341_WHITE);
     tft.fillScreen(ILI9341_BLACK);
@@ -213,13 +208,13 @@ void setup() {
     tft.setCursor(150,80);
     tft.print(increment);
     
-    //seleccio increment de temps
+    //increaseing time select
    while(digitalRead(btnOk)==LOW)
       {
       if(digitalRead(btnSegMin)==HIGH)
         {
-        tft.setTextColor(ILI9341_BLACK); //pinto el numere de negre i dspres escric a sobre
-        tft.setCursor(150,80);           //el nou numero en blanc
+        tft.setTextColor(ILI9341_BLACK); 
+        tft.setCursor(150,80);           
         tft.print(increment);
         increment++;
         tft.setTextColor(ILI9341_WHITE);
@@ -228,7 +223,7 @@ void setup() {
         delay(250);
         } 
       }
-    //faig servir la mateixa variable pels minuts
+    //using the same var for the minutes
    tft.fillScreen(ILI9341_BLACK);
    tft.setCursor(0,20);
    tft.setTextSize(2);
@@ -276,10 +271,10 @@ void setup() {
    tft.setCursor(0,220);
    tft.setTextSize(1);
    tft.setTextColor(ILI9341_WHITE);
-   tft.print("clica 'OK' per iniciar la partida");     
+   tft.print("clica 'OK' per iniciar la partida");     //it means "Ok to start the game"
 }
 
-//******************* INICI PARTIDA *************************
+//*********************** LOOP ******************************
 //***********************************************************
  
 
