@@ -1,53 +1,38 @@
 
-//NOTA IMPORTANT!!! per poder fer anar el Display he hagut d'esborrar del fitxer:
-// /home/marc/Arduino/libraries/LED_Backpack_Library/Adafruit_LEDBackpack.cpp
-// totes los void que em donaven conflicte que són en definitiva les que afectaven
-// al codi per la matriu de leds ja que es una llibreira compartida tant per una matriu
-// LED com pel display. En concret son 3 les voids esborrades:
+//I had to remove 3 voids in the ...Arduino/libraries/LED_Backpack_Library/Adafruit_LEDBackpack.cpp
+//in order to run the displays:
 
 // void Adafruit_8x16matrix::drawPixel(int16_t x, int16_t y, uint16_t color)
 // void Adafruit_8x8matrix::drawPixel(int16_t x, int16_t y, uint16_t color)
 // void Adafruit_BicolorMatrix::drawPixel(int16_t x, int16_t y, uint16_t color)
 
-/*Proba per escriure un numero en una posicio o varis numseros
- * en varies posicions
- */
- 
 #include <Wire.h> 
-#include "Adafruit_LEDBackpack.h" //controla una matriu LED i un Disp 7 seg.
+#include "Adafruit_LEDBackpack.h" 
 #include "Adafruit_GFX.h"
 
-//Display de 7 segments
 Adafruit_7segment matrix = Adafruit_7segment();
 
-
-//faig servir les mateixes varibales que pel micro
-int btnSegMin=3; //boto de segons minuts
-int btnOk=4;     //botó OK
+int btnSegMin=3; 
+int btnOk=4;     
 int ahores=0;
 int aminuts=0;
 int asegons=0;
 int segTotB=0;
 int segTotN=0;
-int btnBlanques=5;   //PIN 5 del NANO
-int senyalMicro=12;  //PIN D12 del NANO
+int btnBlanques=5;   
+int senyalMicro=12;  
 int ledB=A2;
 int ledN=A3;
 int buzzer=A6;
-bool auxSenyal=0;    //senyal que li diu al micro que ja pot començar
-                     //a descommptar el temps
-
+bool auxSenyal=0;   
 int increment=1;
 int minuts=1;
 int desenesMinuts=1;
 
 
-
 void setup() {
    
   Serial.begin(9600);
-   //poso display negres sense iluminar
- 
    
    matrix.begin(0x74);  //7segment I2C adress for Black
    matrix.writeDigitNum(0, -1, false);
@@ -67,7 +52,7 @@ void setup() {
    pinMode(ledN,OUTPUT);
    pinMode(buzzer,OUTPUT);
    delay(250);
-   /////////////////////////////////////////delay(5500); //temps en que es mostra la caratula amb el MICRO
+   /////////////////////////////////////////delay(5500); //Micro header time
    
    matrix.writeDigitNum(0, -1, false);
    matrix.writeDigitNum(1, -1, false);
@@ -123,7 +108,7 @@ void setup() {
     matrix.writeDisplay();
     delay(250);
    
-   //sel.leccio minuts
+   //minutes select
    while(digitalRead(btnOk)==LOW)
       {
       if(digitalRead(btnSegMin)==HIGH)
@@ -148,8 +133,7 @@ void setup() {
         delay(250);
         } 
       }
-      //resto una unitat als minuts i a desenesMinuts perquè m¡ha fet
-      //l'ultim increment!!
+      
       minuts--;
       desenesMinuts--;
       segTotB=(minuts+(desenesMinuts)*10)*60;
@@ -168,16 +152,11 @@ void setup() {
       delay(250);
 }
 
-/**************   AQUÍ COMENÇA EL CODI DEL RELLOTGE   ********/
+/*************************   LOOP   **************************/
 /*************************************************************/
 
 void loop() 
   {
-  
-  //primer espero la senyal del MICRO que em diu si el taulell esta apunt per
-  //començar la partida, és la senyal 
-  
-  
   while(!auxSenyal)
     {
     if(digitalRead(senyalMicro)==LOW) {auxSenyal=0;}
@@ -199,27 +178,27 @@ void descompteTemps()
      delay(250);
      noTone(buzzer);}
   
-  if(digitalRead(btnBlanques)==LOW) //si esta clicat el pulsador de les negres descompta temps blanques
+  if(digitalRead(btnBlanques)==LOW) 
     {
     digitalWrite(ledB,HIGH);
     digitalWrite(ledN,LOW);
-    segTotN=segTotN+increment; // 1er augmenta comptador negres amb l'increment
+    segTotN=segTotN+increment; 
     escriuDisplay(segTotN,0x74);
     while(digitalRead(btnBlanques)==LOW)
       {
-      segTotB--; //2on disminueix el temps de les blanques
+      segTotB--; 
       if(segTotB==0)
         {
-        finalPartida(0x70); //els blancs han esgotat el temps
+        finalPartida(0x70); //end of game
         }        
-      else  //segueix descomptant temps blanques
+      else  
         {
         escriuDisplay(segTotB,0x70);
-        if(digitalRead(btnOk)==HIGH)  //fara una pausa al joc, es queda tot quiet
+        if(digitalRead(btnOk)==HIGH)  //Pause
           {
           pausa();
           }
-        delay(1000); //es el segon unitat de temps
+        delay(1000); //this is the unit se second
         }
       }
     }
@@ -234,9 +213,9 @@ void descompteTemps()
       segTotN--;
       if(segTotN==0)
         {
-        finalPartida(0x74); //els negres han esgotat el temps
+        finalPartida(0x74); 
         }        
-      else  //segueix descomptant temps blanques
+      else  
         {
         escriuDisplay(segTotN,0x74);
         if(digitalRead(btnOk)==HIGH)  //fara una pausa al joc, es queda tot quiet
@@ -251,7 +230,7 @@ void descompteTemps()
  }  //void
 
 
-//aquesta acció la faré servir sempre per escriure als displays
+//display writing
 void escriuDisplay(int segons,byte adress)
   {
   matrix.begin(adress);  //la del display que toqui
@@ -264,12 +243,12 @@ void escriuDisplay(int segons,byte adress)
   matrix.writeDisplay();
   }
 
-
+//void pause
 void pausa()
   {
   int pausa=1;
     delay(1500);
-    while(pausa==1) //quan torni a clicar ok surto del bucle i de la pausa
+    while(pausa==1) 
       {
       if(digitalRead(btnOk)==HIGH)
         {
@@ -291,20 +270,8 @@ void finalPartida(byte adress)
   matrix.writeDisplay(); 
   while(1)
     {
-    //no fer res fins que no es cliqui el boto de reset 
+    //do nothing 
       
     }     
   }
-/*  matrix.writeDigitNum(0, 7, false); //write number 7 in position 0 &dot due to TRUE
-  matrix.setBrightness(3);
-  matrix.writeDigitNum(1, 8, false);
-  matrix.drawColon(true);
-  matrix.writeDigitNum(3, 8, false);
-  matrix.writeDigitNum(4, 8, false);
-  matrix.writeDisplay();
-  delay(500);
-  matrix.clear();
-  matrix.writeDisplay();
-  delay(500);
- */
 
